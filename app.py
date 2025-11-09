@@ -147,7 +147,7 @@ with col_iso3:
 st.write("---")
 
 # ========= RESUMEN =========
-st.header("Resumen")
+st.header("Summary")
 resumen = {
     "Preset Name": preset_name,
     "Film Simulation": fs_elegido,
@@ -166,7 +166,7 @@ resumen = {
 
 st.table({"Ajuste": list(resumen.keys()), "Valor": list(resumen.values())})
 
-st.subheader("Descargar Preset")
+st.subheader("Download Preset")
 
 # CSV
 csv_data = csv_de_receta(resumen)
