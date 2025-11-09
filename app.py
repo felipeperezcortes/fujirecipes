@@ -78,7 +78,7 @@ def csv_de_receta(dic):
 st.write("---")
 
 # ========= NOMBRE DEL PRESET =========
-st.subheader("Nombre del preset")
+st.subheader("Preset Name")
 preset_name = st.text_input("Escribe el nombre de tu preset", value="Mi receta")
 st.write("---")
 
