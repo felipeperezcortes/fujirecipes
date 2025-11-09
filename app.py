@@ -79,7 +79,7 @@ st.write("---")
 
 # ========= NOMBRE DEL PRESET =========
 st.subheader("Preset Name")
-preset_name = st.text_input("Enter your preset name", value="Mi receta")
+preset_name = st.text_input("Enter your preset name here:", value="Mi receta")
 st.write("---")
 
 # ========= FILM SIMULATION =========
