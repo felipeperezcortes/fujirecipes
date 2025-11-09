@@ -171,7 +171,7 @@ st.subheader("Download Preset")
 # CSV
 csv_data = csv_de_receta(resumen)
 st.download_button(
-    label="📄 Descargar como CSV",
+    label="📄 Download as CSV",
     data=csv_data.encode("utf-8"),
     file_name=f"{preset_name.replace(' ', '_')}.csv",
     mime="text/csv",
@@ -183,7 +183,7 @@ def resumen_a_txt(res):
 
 txt_bytes = io.BytesIO(resumen_a_txt(resumen).encode("utf-8"))
 st.download_button(
-    label="🗒️ Descargar como TXT",
+    label="🗒️ Download as TXT",
     data=txt_bytes,
     file_name=f"{preset_name.replace(' ', '_')}.txt",
     mime="text/plain",
