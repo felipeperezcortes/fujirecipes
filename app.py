@@ -1,15 +1,16 @@
 # app.py
-import streamlit as st
-from io import StringIO
+import io
 import csv
+from io import StringIO
 from datetime import datetime
+import streamlit as st
 
+# ================== CONFIG ==================
 st.set_page_config(page_title="Fujifilm Recipes",
                    page_icon="🎞️", layout="centered")
 st.title("Fujifilm Recipes")
 
-# ========= TUS DICCIONARIOS ORIGINALES =========
-
+# ================== DICCIONARIOS ORIGINALES ==================
 film = {
     "Film Simulation": {
         1: "Provia",
@@ -80,8 +81,12 @@ dynamic = {
 }
 
 high = {
-    "Highlight": {i: v for i, v in enumerate(
-        ["-4", "-3.5", "-3", "-2.5", "-2", "-1.5", "-1", "-0.5", "0", "+0.5", "+1", "+1.5", "+2", "+2.5", "+3", "+3.5", "+4"], 1)}
+    "Highlight": {
+        i: v for i, v in enumerate(
+            ["-4", "-3.5", "-3", "-2.5", "-2", "-1.5", "-1", "-0.5",
+             "0", "+0.5", "+1", "+1.5", "+2", "+2.5", "+3", "+3.5", "+4"], 1
+        )
+    }
 }
 
 shadow = {
@@ -100,12 +105,6 @@ iso_nr = {
     }
 }
 
-clarity = {
-    "Clarity": {
-        1: "+4", 2: "+3", 3: "+2", 4: "+1", 5: "0", 6: "-1", 7: "-2", 8: "-3", 9: "-4"
-    }
-}
-
 iso = {
     "ISO": {
         1: "Manual",
@@ -113,10 +112,11 @@ iso = {
     }
 }
 
-# ========= HELPERS =========
+# ================== HELPERS ==================
 
 
 def opciones(d: dict, key: str):
+    """Devuelve (indices, labels, inverso) desde un diccionario padre/hijo."""
     inner = d[key]
     idxs = list(inner.keys())
     labels = [inner[i] for i in idxs]
@@ -125,6 +125,7 @@ def opciones(d: dict, key: str):
 
 
 def csv_de_receta(dic):
+    """Convierte un dict a CSV (una fila)."""
     s = StringIO()
     writer = csv.DictWriter(s, fieldnames=list(dic.keys()))
     writer.writeheader()
@@ -132,23 +133,29 @@ def csv_de_receta(dic):
     return s.getvalue()
 
 
+def resumen_a_txt(res):
+    """Convierte el dict en texto legible."""
+    lineas = [f"{k}: {v}" for k, v in res.items()]
+    return "\n".join(lineas)
+
+
 st.write("---")
 
-# ========= NOMBRE DEL PRESET =========
+# ================== NOMBRE DEL PRESET ==================
 st.subheader("Nombre del preset")
 preset_name = st.text_input(
     "Escribe el nombre de tu preset", value="Mi receta")
 
 st.write("---")
 
-# ========= FILM SIMULATION =========
+# ================== FILM SIMULATION ==================
 st.header("Film Simulation")
 _, film_labels, _ = opciones(film, "Film Simulation")
 fs_elegido = st.selectbox("Film Simulation", film_labels, index=0)
 
 st.write("---")
 
-# ========= COLOR CHROME (PESTAÑAS) =========
+# ================== COLOR CHROME (PESTAÑAS) ==================
 st.header("Color Chrome")
 tab_cc, tab_ccb = st.tabs(["Color Chrome", "Color Chrome Blue"])
 
@@ -164,7 +171,7 @@ with tab_ccb:
 
 st.write("---")
 
-# ========= WHITE BALANCE =========
+# ================== WHITE BALANCE ==================
 st.header("White Balance")
 _, wb_labels, _ = opciones(white, "White Balance")
 wb_elegido = st.selectbox("White Balance", wb_labels, index=1)
@@ -184,7 +191,7 @@ if wb_elegido == "Kelvin":
 
 st.write("---")
 
-# ========= DETAIL =========
+# ================== DETAIL ==================
 st.header("Detail")
 col_d1, col_d2 = st.columns(2)
 
@@ -204,22 +211,25 @@ with col_d2:
 
 st.write("---")
 
-# ========= ISO + DYNAMIC RANGE + HIGH ISO NR =========
+# ================== ISO + DR + HIGH ISO NR ==================
 st.header("ISO Settings")
 col_iso1, col_iso2, col_iso3 = st.columns(3)
+
 with col_iso1:
     _, iso_labels, _ = opciones(iso, "ISO")
     iso_elegido = st.selectbox("ISO Type", iso_labels, index=1)
+
 with col_iso2:
     _, dr_labels, _ = opciones(dynamic, "Dynamic Range")
     dr_elegido = st.selectbox("Dynamic Range", dr_labels, index=0)
+
 with col_iso3:
     _, nr_labels, _ = opciones(iso_nr, "High ISO NR")
     iso_nr_elegido = st.selectbox("High ISO NR", nr_labels, index=4)
 
 st.write("---")
 
-# ========= RESUMEN =========
+# ================== RESUMEN ==================
 st.header("Resumen")
 
 resumen = {
@@ -238,14 +248,28 @@ resumen = {
     "High ISO NR": iso_nr_elegido
 }
 
-# Mostrar tabla limpia
+# Mostrar tabla limpia (dos columnas)
 st.table({"Ajuste": list(resumen.keys()), "Valor": list(resumen.values())})
 
-# Descargar CSV
+st.write("---")
+
+# ================== DESCARGAS ==================
+st.subheader("Descargar Preset")
+
+# CSV
 csv_data = csv_de_receta(resumen)
 st.download_button(
-    label="Descargar preset como CSV",
+    label="Descargar como CSV",
     data=csv_data.encode("utf-8"),
-    file_name=f"fujifilm_preset_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+    file_name=f"{preset_name.replace(' ', '_')}.csv",
     mime="text/csv",
+)
+
+# TXT
+txt_bytes = io.BytesIO(resumen_a_txt(resumen).encode("utf-8"))
+st.download_button(
+    label="Descargar como TXT",
+    data=txt_bytes,
+    file_name=f"{preset_name.replace(' ', '_')}.txt",
+    mime="text/plain",
 )
